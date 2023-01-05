@@ -17,31 +17,86 @@ java {
 }
 
 dependencies {
-	implementation files('jar/java_commons.jar')
+	implementation files('jar/xj_commons.jar')
 	implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.0.1'
+	testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
 	
 }
 
 sourceSets {
-	main {
-		java {
-			srcDirs 'src'
+    main {
+        java {
+            srcDir 'main/src'
+        }
+        resources {
+			srcDir 'main/resources'
 		}
-		resources {
-			srcDir 'resources'
+    }
+    test {
+        java {
+            srcDir 'test/src'
+        }
+        resources {
+			srcDir 'test/resources'
 		}
-	}
- }
+    }
+}
 
  tasks.withType(JavaCompile){
 	options.encoding = 'UTF-8'
 }
  
- mainClassName='begyyal.splatoon.Entrypoint'
+ mainClassName='begyyal.trading.Entrypoint'
  
  javafx {
     version = '17.0.1'
     modules = [ 'javafx.controls', 'javafx.fxml' ]
 }
 
- 
+delete('META-INF/')
+copy {
+	from '../LICENSE'
+	into 'META-INF/'
+}
+
+jar {
+	archivesBaseName = 'trading_calculator'
+	manifest {
+		attributes("Main-Class": 'begyyal.trading.EntryPoint')
+	}
+	from configurations.compileClasspath.collect{ it.isDirectory() ? it : zipTreeByCustom(it) }
+}
+
+FileTree zipTreeByCustom(File f){
+	
+	def layerArr = getLayerArr(f.toString())
+	def plainKey = layerArr[layerArr.length-1]
+	def splittedKey = plainKey.split('\\.'), keyStr = splittedKey[0]
+	if(splittedKey.length != 1){
+		def keyLength = plainKey.length() -1 -splittedKey[splittedKey.length-1].length()
+		keyStr = plainKey.substring(0, keyLength)
+	}
+    
+	def t = zipTree(f)
+	def meta = t.matching{ include 'META-INF/**' }
+	def classes = t.matching{ exclude 'META-INF/**' }
+	
+	def pjdirLayerLength = getLayerArr(getProjectDir().toString()).length
+	def metainfLayers = Arrays.copyOfRange(getLayerArr(meta.iterator().next().toString()), pjdirLayerLength, pjdirLayerLength + 5)
+	def metainfRelPath = String.join('/', metainfLayers)
+	def newMetainfRelPath =  'META-INF/' + keyStr
+	
+	copy {
+		into newMetainfRelPath
+		from metainfRelPath
+	}
+    
+	return classes
+}
+
+String[] getLayerArr(String path){
+	def isWin = File.separator == '\\'
+	return path.split(isWin ? '\\\\' : File.separator)
+}
+
