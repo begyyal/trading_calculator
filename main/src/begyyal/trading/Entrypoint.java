@@ -3,7 +3,7 @@ package begyyal.trading;
 import java.io.IOException;
 
 import begyyal.trading.function.PropValidator;
-import begyyal.trading.gui.StageOrganizer;
+import begyyal.trading.gui.StageConstructor;
 import begyyal.trading.processor.Recorder;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -22,8 +22,7 @@ public class Entrypoint extends Application {
     public void start(Stage stage) {
 	try {
 	    this.rec = Recorder.newi();
-	    var dataBundle = rec.run();
-	    StageOrganizer.newi(dataBundle).process(stage);
+	    StageConstructor.newi(rec.run()).process(stage);
 	} catch (Exception e) {
 	    System.out.println("[ERROR] Error occured in JavaFX app thread.");
 	    e.getMessage();
