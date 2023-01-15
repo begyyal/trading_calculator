@@ -2,12 +2,12 @@ package begyyal.trading.constant;
 
 import java.net.URI;
 
-public enum IkaringApi {
+public enum MarketDataEndpoint {
     RESULTS("https://app.splatoon2.nintendo.net/api/results");
 
     public final String url;
 
-    private IkaringApi(String url) {
+    private MarketDataEndpoint(String url) {
 	this.url = url;
     }
 

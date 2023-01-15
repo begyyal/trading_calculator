@@ -25,19 +25,19 @@ public class SetupResolver {
 
     public void setupPaneData(DisplayDataBundle dataBundle) {
 
-	this.palette.dispDataMap.entrySet().forEach(e -> {
-	    var dr = e.getKey().dr;
-	    if (dr == null) {
-		e.getValue().series.setName("Win rates / " + DispGameType.TOTAL);
-		e.getValue().series.setData(dataBundle.totalData.data);
-		e.getValue().ppre = dataBundle.totalData.ppre;
-	    } else {
-		e.getValue().series.setName("Win rates / " + dr.type + " / " + dr.label);
-		var pd = dataBundle.extractData(dr);
-		e.getValue().series.setData(pd.data);
-		e.getValue().ppre = pd.ppre;
-	    }
-	});
+//	this.palette.dispDataMap.entrySet().forEach(e -> {
+//	    var dr = e.getKey().dr;
+//	    if (dr == null) {
+//		e.getValue().series.setName("Win rates / " + DispGameType.TOTAL);
+//		e.getValue().series.setData(dataBundle.totalData.data);
+//		e.getValue().ppre = dataBundle.totalData.ppre;
+//	    } else {
+//		e.getValue().series.setName("Win rates / " + dr.type + " / " + dr.label);
+//		var pd = dataBundle.extractData(dr);
+//		e.getValue().series.setData(pd.data);
+//		e.getValue().ppre = pd.ppre;
+//	    }
+//	});
     }
 
     public void setupPpre() {

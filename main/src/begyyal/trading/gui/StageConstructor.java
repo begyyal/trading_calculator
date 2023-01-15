@@ -3,8 +3,14 @@ package begyyal.trading.gui;
 import java.util.Arrays;
 import java.util.ResourceBundle;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import begyyal.commons.constant.Stonk;
 import begyyal.commons.constant.Strs;
+import begyyal.commons.object.collection.XList.XListGen;
+import begyyal.trading.constant.CcyPair;
+import begyyal.trading.constant.Commodity;
 import begyyal.trading.constant.WHConf;
 import begyyal.trading.gui.constant.DispGameType;
 import begyyal.trading.gui.constant.DispRule;
@@ -13,6 +19,7 @@ import begyyal.trading.gui.constant.PaneState;
 import begyyal.trading.gui.object.ComponentPalette;
 import begyyal.trading.gui.object.DispPaneData;
 import begyyal.trading.gui.object.DisplayedState;
+import begyyal.trading.object.CategoryState;
 import begyyal.trading.object.DisplayDataBundle;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener.Change;
@@ -23,11 +30,14 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 public class StageConstructor {
@@ -79,15 +89,15 @@ public class StageConstructor {
 	var palette = new ComponentPalette(typeOpt, ruleOpt, termOpt);
 
 	var resolver = new SetupResolver(palette, this.initWinHeight, this.initWinWidth);
-	resolver.setupPaneData(dataBundle);
-	resolver.setupPpre();
-	resolver.setupLineChart();
-	resolver.setupCurrentRate(this.current.rate);
+//	resolver.setupPaneData(dataBundle);
+//	resolver.setupPpre();
+//	resolver.setupLineChart();
+//	resolver.setupCurrentRate(this.current.rate);
+//
+//	this.addListenersTo(palette);
+//	this.setDefaultValuesTo(palette);
 
-	this.addListenersTo(palette);
-	this.setDefaultValuesTo(palette);
-
-	var pane = constructPane(palette);
+	var pane = this.constructPane(palette, stage);
 	Scene scene = new Scene(pane, this.initWinWidth, this.initWinHeight);
 	stage.setScene(scene);
 	stage.show();
@@ -156,31 +166,23 @@ public class StageConstructor {
 	palette.termCombo.setValue(this.term[0]);
     }
 
-    private GridPane constructPane(ComponentPalette palette) {
+    private GridPane constructPane(ComponentPalette palette, Stage stage) {
 
 	var grid = new GridPane();
 	grid.setVgap(5);
 	grid.setHgap(10);
 	grid.setPadding(new Insets(10, 10, 10, 10));
 
+	// dialog window
+
 	// index
-	this.appendCategoryGrids(grid, "Stock Index", 0,
-	    this.createCategoryPane("US30"),
-	    this.createCategoryPane("US500"),
-	    this.createCategoryPane("EU50"),
-	    this.createCategoryPane("UK100"));
+	this.appendCategoryGrids(grid, "Stock Index", 0, Stonk.values());
 
 	// FX
-	this.appendCategoryGrids(grid, "FX", 1,
-	    this.createCategoryPane("USD/JPY"),
-	    this.createCategoryPane("EUR/ZAR"),
-	    this.createCategoryPane("USD/CHF"));
+	this.appendCategoryGrids(grid, "FX", 1, CcyPair.values());
 
 	// commodity
-	this.appendCategoryGrids(grid, "Commodity", 2,
-	    this.createCategoryPane("Gold"),
-	    this.createCategoryPane("Platinum"),
-	    this.createCategoryPane("Crude Oil"));
+	this.appendCategoryGrids(grid, "Commodity", 2, Commodity.values());
 
 	// result view
 	var rvg = new HBox();
@@ -210,35 +212,85 @@ public class StageConstructor {
 	return grid;
     }
 
-    private void appendCategoryGrids(GridPane parent, String cname, int i, Node... nodes) {
+    private <T> Dialog<T> createDialog(ObservableList<T> values) {
+	var dialog = new Dialog<T>();
+	dialog.setTitle("Add Category");
+	var combo = new ComboBox<T>(values);
+	dialog.getDialogPane().setContent(combo);
+	dialog.getDialogPane().getButtonTypes().addAll(
+	    ButtonType.OK,
+	    ButtonType.CANCEL);
+	var btns = dialog.getDialogPane().getChildren().stream()
+	    .flatMap(n -> (n instanceof ButtonBar)
+		    ? ((ButtonBar) n).getButtons().stream()
+			.filter(n2 -> !((Button) n2).isCancelButton())
+		    : Stream.empty())
+	    .map(n -> {
+		n.setDisable(true);
+		return n;
+	    })
+	    .collect(XListGen.collect());
+	combo.valueProperty().addListener((obs, o, n) -> {
+	    if (n != null && o != n) {
+		btns.forEach(b -> b.setDisable(false));
+		// TODO validate
+	    }
+	});
+	dialog.setResultConverter(bt -> bt == ButtonType.OK ? combo.getValue() : null);
+	return dialog;
+    }
+
+    private <T extends Enum<T>> void appendCategoryGrids(
+	GridPane parent,
+	String cname,
+	int i,
+	T[] values) {
 
 	var title1 = new Label(cname);
 	title1.setStyle("-fx-font-size: 18; -fx-font-weight: bold");
 	parent.add(title1, 0, i * 2, 1, 1);
 
+	var cbValues = FXCollections.observableArrayList(values);
+	var dlg = this.createDialog(cbValues);
+
+	var grid = new GridPane();
 	var ad1 = new HBox();
-	ad1.getChildren().addAll(new Button("Add"));
+	var btn = new Button("Add");
+	btn.setOnAction(e -> {
+	    var states = this.dataBundle.getCategoryStates(values[0].getClass());
+	    cbValues.clear();
+	    dlg.setResult(null);
+	    Arrays.stream(values)
+		.filter(v -> !states.stream()
+		    .map(s -> s.category)
+		    .collect(Collectors.toSet())
+		    .contains(v))
+		.forEach(cbValues::add);
+	    var opt = dlg.showAndWait();
+	    if (opt.isEmpty())
+		return;
+	    var result = opt.get();
+	    grid.add(this.createCategoryPane(result), states.size(), 0);
+	    states.add(CategoryState.newi(result));
+	});
+	ad1.getChildren().addAll(btn);
 	ad1.setAlignment(Pos.CENTER_RIGHT);
 	ad1.setPadding(new Insets(0, 10, 0, 10));
 	parent.add(ad1, 1, i * 2, 1, 1);
 
-	var grid = new GridPane();
 	grid.setHgap(10);
-	int ci = 0;
-	for (Node n : nodes)
-	    grid.add(n, ci++, 0);
 	grid.setPrefSize(this.initWinWidth, WHConf.categoryHeight);
 	grid.setBackground(GuiParts.bkgBlue);
 	parent.add(grid, 0, i * 2 + 1, 2, 1);
     }
 
-    private Node createCategoryPane(String name) {
+    private <T extends Enum<T>> Node createCategoryPane(T category) {
 	var grid = new GridPane();
 	grid.setPrefSize(WHConf.categoryHeight, WHConf.categoryWidth);
 	grid.setVgap(3);
 	grid.setPadding(new Insets(5, 5, 5, 5));
 	grid.setBorder(GuiParts.plainBorder);
-	var l = new Label(name);
+	var l = new Label(category.toString());
 	l.setStyle("-fx-font-size: 14");
 	grid.add(l, 0, 0, 2, 1);
 	grid.add(this.newLeftLabel("quote"), 0, 1);
