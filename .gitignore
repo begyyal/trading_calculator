@@ -7,4 +7,5 @@ build_exe/
 .gradle
 .project
 
-resources/common.properties
+test/
+main/resources/common.properties
