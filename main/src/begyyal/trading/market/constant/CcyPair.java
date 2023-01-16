@@ -1,4 +1,4 @@
-package begyyal.trading.constant;
+package begyyal.trading.market.constant;
 
 import begyyal.commons.constant.Ccy;
 

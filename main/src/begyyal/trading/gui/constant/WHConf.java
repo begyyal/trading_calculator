@@ -1,4 +1,4 @@
-package begyyal.trading.constant;
+package begyyal.trading.gui.constant;
 
 public class WHConf {
     public static final int categoryHeight = 190;

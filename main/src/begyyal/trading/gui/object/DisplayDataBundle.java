@@ -1,10 +1,11 @@
-package begyyal.trading.object;
+package begyyal.trading.gui.object;
 
 import begyyal.commons.constant.Stonk;
 import begyyal.commons.object.collection.XMap;
 import begyyal.commons.object.collection.XMap.XMapGen;
-import begyyal.trading.constant.CcyPair;
-import begyyal.trading.constant.Commodity;
+import begyyal.trading.market.constant.CcyPair;
+import begyyal.trading.market.constant.Commodity;
+import begyyal.trading.object.CategoryState;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
