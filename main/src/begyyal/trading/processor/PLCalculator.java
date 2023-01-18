@@ -16,7 +16,8 @@ public class PLCalculator {
 	    .flatMap(e -> e.getValue().stream())
 	    .forEach(state -> {
 		var priceSet = mktdata.getPriceSet(state.key);
-		state.quote.set(priceSet.current);
+		if (priceSet != null)
+		    state.quote.set(priceSet.current);
 	    });
     }
 }

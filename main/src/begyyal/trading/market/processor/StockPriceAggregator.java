@@ -1,5 +1,6 @@
 package begyyal.trading.market.processor;
 
+import begyyal.commons.constant.Strs;
 import begyyal.commons.object.collection.XMap;
 import begyyal.commons.util.function.XNumbers;
 import begyyal.trading.logger.TCLogger;
@@ -57,7 +58,12 @@ public class StockPriceAggregator implements Aggregator<StockDataSet> {
 	    TCLogger.printScrapingFailure(type, MarketDataDomain.InvestingDotCom, false);
 	    return null;
 	}
-	var price = ho2.getTip().getContents().getTip();
+	var plainStr = ho2.getTip().getContents().getTip();
+	if (plainStr == null) {
+	    TCLogger.printScrapingFailure(type, MarketDataDomain.InvestingDotCom, false);
+	    return null;
+	}
+	var price = plainStr.replace(Strs.comma, Strs.empty);
 	return XNumbers.checkIfParsable(price, true) ? Double.valueOf(price) : null;
     }
 
@@ -71,7 +77,7 @@ public class StockPriceAggregator implements Aggregator<StockDataSet> {
 	    TCLogger.printScrapingFailure(type, MarketDataDomain.InvestingDotCom, true);
 	    return null;
 	}
-	var ho3 = ho2.getTip().getChildren().getTip()
+	var ho3 = ho2.get(0).getChildren().get(0)
 	    .select(ho -> ho.getProperties().entrySet().stream()
 		.filter(prop -> "data-test".equals(prop.getKey())
 			&& "instrument-price-last".equals(prop.getValue()))
@@ -80,7 +86,12 @@ public class StockPriceAggregator implements Aggregator<StockDataSet> {
 	    TCLogger.printScrapingFailure(type, MarketDataDomain.InvestingDotCom, true);
 	    return null;
 	}
-	var price = ho3.getTip().getContents().getTip();
+	var plainStr = ho3.getTip().getContents().getTip();
+	if (plainStr == null) {
+	    TCLogger.printScrapingFailure(type, MarketDataDomain.InvestingDotCom, true);
+	    return null;
+	}
+	var price = plainStr.replace(Strs.comma, Strs.empty);
 	return XNumbers.checkIfParsable(price, true) ? Double.valueOf(price) : null;
     }
 
