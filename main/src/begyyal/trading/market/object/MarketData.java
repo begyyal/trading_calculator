@@ -4,4 +4,6 @@ import begyyal.trading.market.constant.ProductCategory;
 
 public interface MarketData {
     public ProductCategory getCategory();
+
+    public PriceSet getPriceSet(ProductKey<?> key);
 }

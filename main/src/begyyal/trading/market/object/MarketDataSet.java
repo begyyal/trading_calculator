@@ -2,6 +2,7 @@ package begyyal.trading.market.object;
 
 import begyyal.commons.object.collection.XMap;
 import begyyal.commons.object.collection.XMap.XMapGen;
+import begyyal.trading.market.constant.Product;
 import begyyal.trading.market.constant.ProductCategory;
 
 // represents a snapshot
@@ -18,6 +19,10 @@ public class MarketDataSet {
     }
 
     private void appendMarketData(MarketData data) {
-	this.dataset.append(data.getCategory(), data);
+	this.dataset.put(data.getCategory(), data);
+    }
+
+    public <T extends Product> PriceSet getPriceSet(ProductKey<T> key) {
+	return this.dataset.get(key.type.getCategory()).getPriceSet(key);
     }
 }

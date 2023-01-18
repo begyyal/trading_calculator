@@ -2,7 +2,7 @@ package begyyal.trading.market.constant;
 
 import begyyal.commons.constant.Ccy;
 
-public enum CcyPair implements Product {
+public enum Fx implements Product {
     AUD_CAD(Ccy.Aud, Ccy.Cad),
     AUD_JPY(Ccy.Aud, Ccy.Jpy),
     CAD_CHF(Ccy.Cad, Ccy.Chf),
@@ -27,7 +27,7 @@ public enum CcyPair implements Product {
     public final Ccy left;
     public final Ccy right;
 
-    private CcyPair(Ccy left, Ccy right) {
+    private Fx(Ccy left, Ccy right) {
 	this.left = left;
 	this.right = right;
     }

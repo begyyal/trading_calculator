@@ -12,12 +12,12 @@ import begyyal.trading.gui.constant.CallBackType;
 import begyyal.trading.gui.constant.GuiParts;
 import begyyal.trading.gui.constant.WHConf;
 import begyyal.trading.gui.object.DisplayDataBundle;
+import begyyal.trading.gui.object.ProductState;
 import begyyal.trading.gui.util.BDFieldConverter;
-import begyyal.trading.market.constant.CcyPair;
+import begyyal.trading.market.constant.Fx;
 import begyyal.trading.market.constant.Commodity;
 import begyyal.trading.market.constant.Product;
 import begyyal.trading.market.constant.StonkIndex;
-import begyyal.trading.object.ProductState;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -82,7 +82,7 @@ public class StageConstructor {
 	this.appendCategoryGrids(grid, "Stock Index", 0, StonkIndex.values());
 
 	// FX
-	this.appendCategoryGrids(grid, "FX", 1, CcyPair.values());
+	this.appendCategoryGrids(grid, "FX", 1, Fx.values());
 
 	// commodity
 	this.appendCategoryGrids(grid, "Commodity", 2, Commodity.values());
@@ -170,7 +170,7 @@ public class StageConstructor {
 	    dlg.setResult(null);
 	    Arrays.stream(values)
 		.filter(v -> !states.stream()
-		    .map(s -> s.type)
+		    .map(s -> s.key.type) // TODO
 		    .collect(Collectors.toSet())
 		    .contains(v))
 		.forEach(cbValues::add);
@@ -201,7 +201,7 @@ public class StageConstructor {
 	grid.setPadding(new Insets(5, 5, 5, 5));
 	grid.setBorder(GuiParts.plainBorder);
 
-	var l = new Label(state.type.toString());
+	var l = new Label(state.key.type.toString());
 	l.setStyle("-fx-font-size: 14");
 	grid.add(l, 0, 0, 2, 1);
 

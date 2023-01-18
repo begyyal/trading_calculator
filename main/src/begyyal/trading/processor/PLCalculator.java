@@ -10,12 +10,13 @@ public class PLCalculator {
 
     public static void exe(MarketDataSet mktdata, DisplayDataBundle dataBundle) {
 
+	// fill quote
 	dataBundle.productStates
 	    .entrySet().stream()
 	    .flatMap(e -> e.getValue().stream())
 	    .forEach(state -> {
-		var category = state.type.getCategory();
-		var data = mktdata.dataset.get(category);
+		var priceSet = mktdata.getPriceSet(state.key);
+		state.quote.set(priceSet.current);
 	    });
     }
 }

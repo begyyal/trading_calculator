@@ -1,12 +1,14 @@
 package begyyal.trading.market.processor;
 
-import begyyal.commons.constant.Stonk;
 import begyyal.commons.object.collection.XMap;
-import begyyal.commons.util.function.XIntegers;
+import begyyal.commons.util.function.XNumbers;
 import begyyal.trading.logger.TCLogger;
 import begyyal.trading.market.constant.MarketDataDomain;
 import begyyal.trading.market.constant.ProductCategory;
+import begyyal.trading.market.constant.StonkIndex;
 import begyyal.trading.market.object.MarketData;
+import begyyal.trading.market.object.PriceSet;
+import begyyal.trading.market.object.ProductKey;
 import begyyal.trading.market.object.StockDataSet;
 import begyyal.web.WebResourceGetter;
 import begyyal.web.html.object.HtmlObject;
@@ -15,16 +17,17 @@ public class StockPriceAggregator implements Aggregator<StockDataSet> {
 
     private static final String spotUrl = //
 	    MarketDataDomain.InvestingDotCom.url + "/indices/world-indices";
-    private static final XMap<Stonk, String> idcIndicesIdMap = XMap.XMapGen.newi();
-    private static final XMap<Stonk, String> idcFuturePathMap = XMap.XMapGen.newi();
+    private static final XMap<StonkIndex, String> idcIndicesIdMap = XMap.XMapGen.newi();
+    private static final XMap<StonkIndex, String> idcFuturePathMap = XMap.XMapGen.newi();
     {
 	idcIndicesIdMap
-	    .append(Stonk.JP225, "178")
-	    .append(Stonk.US30, "169")
-	    .append(Stonk.US500, "166");
+	    .append(StonkIndex.JP225, "178")
+	    .append(StonkIndex.US30, "169")
+	    .append(StonkIndex.US500, "166");
 	idcFuturePathMap
-	    .append(Stonk.US30, MarketDataDomain.InvestingDotCom.url + "/indices/us-30-futures")
-	    .append(Stonk.US500,
+	    .append(StonkIndex.US30,
+		MarketDataDomain.InvestingDotCom.url + "/indices/us-30-futures")
+	    .append(StonkIndex.US500,
 		MarketDataDomain.InvestingDotCom.url + "/indices/us-spx-500-futures");
     }
 
@@ -34,16 +37,16 @@ public class StockPriceAggregator implements Aggregator<StockDataSet> {
     public void fill(StockDataSet dataSet) {
 	var idcIndicesHo = WebResourceGetter.getHtmlObject(spotUrl);
 	idcIndicesIdMap.entrySet().forEach(e -> {
-	    dataSet.spot.put(e.getKey(),
-		this.getSpotCurrentPriceFromIdc(idcIndicesHo, e.getValue(), e.getKey()));
+	    var current = this.getSpotCurrentPriceFromIdc(idcIndicesHo, e.getValue(), e.getKey());
+	    dataSet.priceMap.put(new ProductKey<>(e.getKey(), false), new PriceSet(current));
 	});
 	idcFuturePathMap.entrySet().forEach(e -> {
-	    dataSet.future.put(e.getKey(),
-		this.getFutureCurrentPriceFromIdc(e.getValue(), e.getKey()));
+	    var current = this.getFutureCurrentPriceFromIdc(e.getValue(), e.getKey());
+	    dataSet.priceMap.put(new ProductKey<>(e.getKey(), true), new PriceSet(current));
 	});
     }
 
-    private Double getSpotCurrentPriceFromIdc(HtmlObject root, String id, Stonk type) {
+    private Double getSpotCurrentPriceFromIdc(HtmlObject root, String id, StonkIndex type) {
 	var ho = root.getElementById("pair_" + id);
 	if (ho == null) {
 	    TCLogger.printScrapingFailure(type, MarketDataDomain.InvestingDotCom, false);
@@ -55,10 +58,10 @@ public class StockPriceAggregator implements Aggregator<StockDataSet> {
 	    return null;
 	}
 	var price = ho2.getTip().getContents().getTip();
-	return XIntegers.checkIfParsable(price) ? Double.valueOf(price) : null;
+	return XNumbers.checkIfParsable(price, true) ? Double.valueOf(price) : null;
     }
 
-    private Double getFutureCurrentPriceFromIdc(String url, Stonk type) {
+    private Double getFutureCurrentPriceFromIdc(String url, StonkIndex type) {
 	var root = WebResourceGetter.getHtmlObject(url);
 	var ho2 = root.select(ho -> ho.getProperties().entrySet().stream()
 	    .filter(prop -> "data-test".equals(prop.getKey())
@@ -78,7 +81,7 @@ public class StockPriceAggregator implements Aggregator<StockDataSet> {
 	    return null;
 	}
 	var price = ho3.getTip().getContents().getTip();
-	return XIntegers.checkIfParsable(price) ? Double.valueOf(price) : null;
+	return XNumbers.checkIfParsable(price, true) ? Double.valueOf(price) : null;
     }
 
     @Override

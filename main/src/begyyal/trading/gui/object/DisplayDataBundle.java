@@ -7,7 +7,7 @@ import begyyal.commons.object.collection.XMap.XMapGen;
 import begyyal.trading.db.object.TCTable;
 import begyyal.trading.market.constant.Product;
 import begyyal.trading.market.constant.ProductCategory;
-import begyyal.trading.object.ProductState;
+import begyyal.trading.market.object.ProductKey;
 import javafx.beans.property.LongProperty;
 import javafx.beans.property.SimpleLongProperty;
 
@@ -31,9 +31,9 @@ public class DisplayDataBundle {
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends Product> ProductState<T> getProductState(T type) {
-	return (ProductState<T>) this.productStates.get(type.getCategory())
-	    .stream().filter(cs -> cs.type == type)
+    public <T extends Product> ProductState<T> getProductState(ProductKey<T> key) {
+	return (ProductState<T>) this.productStates.get(key.type.getCategory())
+	    .stream().filter(cs -> cs.key.equals(key))
 	    .findFirst().orElse(null);
     }
 }
