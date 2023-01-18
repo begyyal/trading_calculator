@@ -1,0 +1,32 @@
+Manifest-Version: 1.0
+Bnd-LastModified: 1335116293744
+Build-Jdk: 1.6.0_31
+Built-By: tsaloranta
+Bundle-Description: Core Jackson abstractions, basic JSON streaming API 
+ implementation
+Bundle-DocURL: http://fasterxml.com
+Bundle-License: http://www.apache.org/licenses/LICENSE-2.0.txt
+Bundle-ManifestVersion: 2
+Bundle-Name: Jackson-core
+Bundle-SymbolicName: jackson-core
+Bundle-Vendor: fasterml.com
+Bundle-Version: 2.0.1
+Created-By: Apache Maven Bundle Plugin
+Export-Package: com.fasterxml.jackson.core;uses:="com.fasterxml.jackson.
+ core.io,com.fasterxml.jackson.core.json,com.fasterxml.jackson.core.util
+ ,com.fasterxml.jackson.core.sym,com.fasterxml.jackson.core.format,com.f
+ asterxml.jackson.core.type";version="2.0.1",com.fasterxml.jackson.core.
+ base;uses:="com.fasterxml.jackson.core,com.fasterxml.jackson.core.json,
+ com.fasterxml.jackson.core.util,com.fasterxml.jackson.core.io";version=
+ "2.0.1",com.fasterxml.jackson.core.format;uses:="com.fasterxml.jackson.
+ core,com.fasterxml.jackson.core.io";version="2.0.1",com.fasterxml.jacks
+ on.core.io;uses:="com.fasterxml.jackson.core,com.fasterxml.jackson.core
+ .util";version="2.0.1",com.fasterxml.jackson.core.json;uses:="com.faste
+ rxml.jackson.core,com.fasterxml.jackson.core.io,com.fasterxml.jackson.c
+ ore.sym,com.fasterxml.jackson.core.format,com.fasterxml.jackson.core.ut
+ il,com.fasterxml.jackson.core.base";version="2.0.1",com.fasterxml.jacks
+ on.core.sym;uses:="com.fasterxml.jackson.core.util";version="2.0.1",com
+ .fasterxml.jackson.core.type;version="2.0.1",com.fasterxml.jackson.core
+ .util;uses:="com.fasterxml.jackson.core,com.fasterxml.jackson.core.io";
+ version="2.0.1"
+Tool: Bnd-1.50.0
