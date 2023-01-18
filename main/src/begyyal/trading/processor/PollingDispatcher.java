@@ -27,7 +27,7 @@ public class PollingDispatcher implements Closeable {
 	var res = ResourceBundle.getBundle("common");
 	this.intervalSec = Integer.parseInt(res.getString("pollingIntervalSec"));
 	this.aggregator = new MarketDataAggregator();
-	this.exe = Executors.newSingleThreadExecutor(XUtils.createPlainThreadFactory("spla-po"));
+	this.exe = Executors.newSingleThreadExecutor(XUtils.createPlainThreadFactory("bg-tc-po"));
 	this.dao = dao;
 	this.table = table;
     }
@@ -47,11 +47,11 @@ public class PollingDispatcher implements Closeable {
 
     public DisplayDataBundle run(XMap<CallBackType, Runnable> cb) throws Exception {
 	var dataBundle = DisplayDataBundle.of(table);
-	this.process(dataBundle);
-	this.exe.execute(() -> {
-	    while (XUtils.sleep(1000 * intervalSec))
-		this.process(dataBundle);
-	});
+	//this.process(dataBundle);
+//	this.exe.execute(() -> {
+//	    while (XUtils.sleep(1000 * intervalSec))
+//		this.process(dataBundle);
+//	});
 	cb.put(CallBackType.Calc, () -> this.process(dataBundle));
 	return dataBundle;
     }

@@ -14,8 +14,8 @@ import begyyal.trading.gui.constant.WHConf;
 import begyyal.trading.gui.object.DisplayDataBundle;
 import begyyal.trading.gui.object.ProductState;
 import begyyal.trading.gui.util.BDFieldConverter;
-import begyyal.trading.market.constant.Fx;
 import begyyal.trading.market.constant.Commodity;
+import begyyal.trading.market.constant.Fx;
 import begyyal.trading.market.constant.Product;
 import begyyal.trading.market.constant.StonkIndex;
 import javafx.collections.FXCollections;
@@ -37,19 +37,20 @@ import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
 public class StageConstructor {
-    private static final TextFormatter<BigDecimal> numFieldFormatter = //
-	    new TextFormatter<BigDecimal>(new BDFieldConverter());
     private final DisplayDataBundle dataBundle;
+    private final XMap<CallBackType, Runnable> callBack;
     private final int initWinHeight;
     private final int initWinWidth;
 
     private StageConstructor(
+	DisplayDataBundle dataBundle,
+	XMap<CallBackType, Runnable> callBack,
 	int windowHeight,
-	int windowWidth,
-	DisplayDataBundle dataBundle) {
+	int windowWidth) {
+	this.dataBundle = dataBundle;
+	this.callBack = callBack;
 	this.initWinHeight = windowHeight;
 	this.initWinWidth = windowWidth;
-	this.dataBundle = dataBundle;
     }
 
     public static StageConstructor newi(
@@ -58,7 +59,7 @@ public class StageConstructor {
 	var res = ResourceBundle.getBundle("common");
 	var windowHeight = Integer.parseInt(res.getString("windowHeight"));
 	var windowWidth = Integer.parseInt(res.getString("windowWidth"));
-	return new StageConstructor(windowHeight, windowWidth, dataBundle);
+	return new StageConstructor(dataBundle, callBack, windowHeight, windowWidth);
     }
 
     public void process(Stage stage) {
@@ -109,7 +110,7 @@ public class StageConstructor {
 	// control panel
 	var grid6 = new HBox();
 	var calc = new Button("Calculate");
-	calc.onActionProperty().addListener(e -> {});
+	calc.setOnAction(e -> this.callBack.get(CallBackType.Calc).run());
 	grid6.getChildren().addAll(calc);
 	grid6.setAlignment(Pos.CENTER_RIGHT);
 	grid6.setPadding(new Insets(0, 10, 0, 10));
@@ -242,12 +243,14 @@ public class StageConstructor {
     }
 
     private Label newLeftLabel(String str) {
-	return new Label(str + " : ");
+	var l = new Label(str + " : ");
+	l.setMinWidth(60);
+	return l;
     }
 
     private TextField newBDField() {
 	var field = new TextField();
-	field.setTextFormatter(numFieldFormatter);
+	field.setTextFormatter(new TextFormatter<BigDecimal>(new BDFieldConverter()));
 	return field;
     }
 }

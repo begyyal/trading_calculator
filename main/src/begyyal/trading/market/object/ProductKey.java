@@ -1,5 +1,7 @@
 package begyyal.trading.market.object;
 
+import java.util.Objects;
+
 import begyyal.trading.market.constant.Product;
 
 public class ProductKey<T extends Product> {
@@ -21,6 +23,11 @@ public class ProductKey<T extends Product> {
 	if (!(o instanceof ProductKey))
 	    return false;
 	var casted = (ProductKey<?>) o;
-	return casted.type == this.type && casted.isFuture == this.isFuture;
+	return casted.type == this.type && (casted.isFuture == this.isFuture);
+    }
+
+    @Override
+    public int hashCode() {
+	return Objects.hash(this.type, this.isFuture);
     }
 }
