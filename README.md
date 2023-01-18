@@ -11,19 +11,19 @@
 
 # Overview
 
-This is a trading tool that calculates risk tolerances, original indicatores, and shows some market data.  
+This is a trading tool that calculates profit and loss, original indicatores, and shows some market data.  
 It's wip currently, first edition's plan is followings.  
 
 ## Conditions
  - java
  - java FX
  - Store data in file directly.  
- - Market data from [TradingEconomics](http://docs.tradingeconomics.com/) is quoted.  
+ - Market data is quoted by web scraping.  
 
 ## Goal
- - Calculate risk tolerance of input positions and lots at stock index, fx, commodities.
- - The risk tolerance is displayed in JPY.
- - The calculation is not automatic, triggered pushing button.
+ - Calculate PL(profit/loss) of input positions and lots at stock index, fx, commodities.
+ - PL is displayed in JPY.
+ - The calculation is triggered pushing button (and considering automatic calculation at fixed interval in a polling thread).
 
 ## Prospects and plan
  - Displaying currency should be optional.
