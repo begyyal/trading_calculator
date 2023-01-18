@@ -6,7 +6,7 @@ import begyyal.trading.constant.FuncConst;
 import begyyal.trading.gui.constant.DispGameType;
 import begyyal.trading.gui.constant.GuiParts;
 import begyyal.trading.gui.object.ComponentPalette;
-import begyyal.trading.object.DisplayDataBundle;
+import begyyal.trading.gui.object.DisplayDataBundle;
 import javafx.beans.property.StringProperty;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
