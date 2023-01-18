@@ -11,6 +11,21 @@
 
 # Overview
 
-This is a basic template repository.  
-It assumes certain operational rules and has a system including workflow configurations that conforms to them.  
-Please see [wiki](https://github.com/begyyal/trading_calculator/wiki) for the details.
+This is a trading tool that calculates risk tolerances, original indicatores, and shows some market data.  
+It's wip currently, first edition's plan is followings.  
+
+## Conditions
+ - java
+ - java FX
+ - Store data in file directly.  
+ - Market data from [TradingEconomics](http://docs.tradingeconomics.com/) is quoted.  
+
+## Goal
+ - Calculate risk tolerance of input positions and lots at stock index, fx, commodities.
+ - The risk tolerance is displayed in JPY.
+ - The calculation is not automatic, triggered pushing button.
+
+## Prospects and plan
+ - Displaying currency should be optional.
+ - The calculation could be automatic due to linking MQL, but it narrows preconditions of using this tool.  
+ - Add to original indicator.
