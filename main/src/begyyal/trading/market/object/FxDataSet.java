@@ -1,5 +1,11 @@
 package begyyal.trading.market.object;
 
-public class FxDataSet {
+import begyyal.trading.market.constant.ProductCategory;
+
+public class FxDataSet implements MarketData {
     
+    @Override
+    public ProductCategory getCategory() {
+	return ProductCategory.Fx;
+    }
 }

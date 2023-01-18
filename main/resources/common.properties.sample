@@ -1,6 +1,4 @@
-iksm=XXXXXXXXXXXXX
-tablePath=C:\\Users\\sample\\splama
-term=100,200,300
+tablePath=C:\\Users\\.tcdb
 pollingIntervalSec=10
 windowHeight=700
 windowWidth=1100
