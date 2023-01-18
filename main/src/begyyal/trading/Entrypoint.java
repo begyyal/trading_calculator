@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import begyyal.trading.function.PropValidator;
 import begyyal.trading.gui.StageConstructor;
+import begyyal.trading.object.DisplayDataBundle;
 import begyyal.trading.processor.Recorder;
 import javafx.application.Application;
 import javafx.application.Platform;

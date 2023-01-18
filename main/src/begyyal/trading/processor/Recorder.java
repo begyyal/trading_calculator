@@ -8,28 +8,23 @@ import java.net.http.HttpResponse.BodyHandlers;
 import java.util.ResourceBundle;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import begyyal.commons.constant.web.HttpHeader;
 import begyyal.commons.constant.web.HttpStatus;
-import begyyal.commons.object.collection.XList;
 import begyyal.commons.object.collection.XList.XListGen;
 import begyyal.commons.util.function.XUtils;
 import begyyal.trading.constant.GameType;
-import begyyal.trading.constant.IkaringApi;
+import begyyal.trading.constant.MarketDataEndpoint;
 import begyyal.trading.constant.Rule;
 import begyyal.trading.db.ResultTableDao;
 import begyyal.trading.gui.constant.GuiParts;
 import begyyal.trading.object.BattleResult;
 import begyyal.trading.object.DisplayDataBundle;
-import begyyal.trading.object.DisplayDataBundle.PaneData;
 import begyyal.trading.object.HttpBandle;
 import begyyal.trading.object.ResultTable;
-import javafx.application.Platform;
 import javafx.scene.chart.XYChart;
 import javafx.scene.chart.XYChart.Data;
 import javafx.scene.layout.Background;
@@ -38,7 +33,7 @@ public class Recorder implements Closeable {
 
     private final int intervalSec;
     private final String sessionId;
-    private final HttpBandle<IkaringApi> httpBandle;
+    private final HttpBandle<MarketDataEndpoint> httpBandle;
     private final ResultTableDao dao;
     private final ExecutorService exe;
 
@@ -46,7 +41,7 @@ public class Recorder implements Closeable {
 	var res = ResourceBundle.getBundle("common");
 	this.intervalSec = Integer.parseInt(res.getString("pollingIntervalSec"));
 	this.sessionId = res.getString("iksm");
-	this.httpBandle = new HttpBandle<IkaringApi>();
+	this.httpBandle = new HttpBandle<MarketDataEndpoint>();
 	this.dao = ResultTableDao.newi();
 	this.exe = Executors.newSingleThreadExecutor(XUtils.createPlainThreadFactory("spla-po"));
     }
@@ -56,32 +51,23 @@ public class Recorder implements Closeable {
     }
 
     public DisplayDataBundle run() throws Exception {
-
-//	this.httpBandle.setReq(IkaringApi.RESULTS, this.createReq());
-//	var res = this.httpBandle.send(IkaringApi.RESULTS, BodyHandlers.ofString());
+//	this.httpBandle.setReq(TradingEconomicsApi.RESULTS, this.createReq());
+//	var res = this.httpBandle.send(TradingEconomicsApi.RESULTS, BodyHandlers.ofString());
 //	var status = HttpStatus.parse(res.statusCode());
 //	if (status.getCategory() != 2)
-//	    if (status == HttpStatus.Forbidden) {
-//		throw new Exception(
-//		    "Http response by the ikaring API shows Forbidden(403) status, "
-//			    + "so iksm_session may be wrong or expired.");
-//	    } else
-//		throw new Exception(
-//		    "Http status by the ikaring API is not success. status:" + status.code);
-//
+//	    throw new Exception("Http status by the API is not success. status:" + status.code);
 //	var dataBundle = new DisplayDataBundle();
 //	this.record(res.body(), dataBundle);
-//
 //	this.exe.execute(() -> {
 //	    while (XUtils.sleep(1000 * intervalSec))
 //		this.process(dataBundle);
 //	});
-	var dataBundle = new DisplayDataBundle();
-	return dataBundle;
+//	return dataBundle;
+	return new DisplayDataBundle();
     }
 
     private void process(DisplayDataBundle dataBundle) {
-	this.httpBandle.sendAsync(IkaringApi.RESULTS, BodyHandlers.ofString())
+	this.httpBandle.sendAsync(MarketDataEndpoint.RESULTS, BodyHandlers.ofString())
 	    .thenApply(HttpResponse::body)
 	    .thenAccept(j -> this.record(j, dataBundle))
 	    .join();
@@ -89,7 +75,7 @@ public class Recorder implements Closeable {
 
     private HttpRequest createReq() {
 	return HttpRequest.newBuilder()
-	    .uri(IkaringApi.RESULTS.toURI())
+	    .uri(MarketDataEndpoint.RESULTS.toURI())
 	    .header(HttpHeader.Cookie.str, "iksm_session=" + this.sessionId)
 	    .build();
     }
@@ -128,24 +114,6 @@ public class Recorder implements Closeable {
 	    list.add(new BattleResult(battleNum, isWin, type, rule, weaponId));
 	}
 
-	if (!table.integrate(list.reverse()) && !dataBundle.totalData.data.isEmpty())
-	    return;
-
-	for (var t : GameType.values())
-	    this.fillPaneData(
-		dataBundle.dataByType.get(t),
-		table.getWinRates(t),
-		table.getTruncationRange(t));
-	for (var r : Rule.values())
-	    this.fillPaneData(
-		dataBundle.dataByRule.get(r),
-		table.getWinRates(r),
-		table.getTruncationRange(r));
-	this.fillPaneData(
-	    dataBundle.totalData,
-	    table.getTotalWinRates(),
-	    table.getTotalTruncationRange());
-
 	try {
 	    this.dao.write(table);
 	} catch (IOException e) {
@@ -153,26 +121,6 @@ public class Recorder implements Closeable {
 	    e.printStackTrace();
 	    return;
 	}
-    }
-
-    private void fillPaneData(
-	PaneData pd,
-	XList<Integer> winRates,
-	XList<Boolean> ppreBase) {
-	var newData = IntStream.range(-winRates.size() + 1, 1)
-	    .mapToObj(i -> this.createDataPoint(i, winRates.next()))
-	    .collect(Collectors.toList());
-	var newPpre = ppreBase.stream()
-	    .map(this::distinguishBkg)
-	    .collect(Collectors.toList());
-	if (pd.data.isEmpty()) {
-	    pd.data.setAll(newData);
-	    pd.ppre.setAll(newPpre);
-	} else
-	    Platform.runLater(() -> {
-		pd.data.setAll(newData);
-		pd.ppre.setAll(newPpre);
-	    });
     }
 
     private Data<Number, Number> createDataPoint(int x, int y) {
