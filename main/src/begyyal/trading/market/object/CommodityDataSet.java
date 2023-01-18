@@ -1,5 +1,10 @@
 package begyyal.trading.market.object;
 
-public class CommodityDataSet {
-    
+import begyyal.trading.market.constant.ProductCategory;
+
+public class CommodityDataSet implements MarketData {
+    @Override
+    public ProductCategory getCategory() {
+	return ProductCategory.Commodity;
+    }
 }
