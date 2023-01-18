@@ -57,26 +57,26 @@ public class Recorder implements Closeable {
 
     public DisplayDataBundle run() throws Exception {
 
-	this.httpBandle.setReq(IkaringApi.RESULTS, this.createReq());
-	var res = this.httpBandle.send(IkaringApi.RESULTS, BodyHandlers.ofString());
-	var status = HttpStatus.parse(res.statusCode());
-	if (status.getCategory() != 2)
-	    if (status == HttpStatus.Forbidden) {
-		throw new Exception(
-		    "Http response by the ikaring API shows Forbidden(403) status, "
-			    + "so iksm_session may be wrong or expired.");
-	    } else
-		throw new Exception(
-		    "Http status by the ikaring API is not success. status:" + status.code);
-
+//	this.httpBandle.setReq(IkaringApi.RESULTS, this.createReq());
+//	var res = this.httpBandle.send(IkaringApi.RESULTS, BodyHandlers.ofString());
+//	var status = HttpStatus.parse(res.statusCode());
+//	if (status.getCategory() != 2)
+//	    if (status == HttpStatus.Forbidden) {
+//		throw new Exception(
+//		    "Http response by the ikaring API shows Forbidden(403) status, "
+//			    + "so iksm_session may be wrong or expired.");
+//	    } else
+//		throw new Exception(
+//		    "Http status by the ikaring API is not success. status:" + status.code);
+//
+//	var dataBundle = new DisplayDataBundle();
+//	this.record(res.body(), dataBundle);
+//
+//	this.exe.execute(() -> {
+//	    while (XUtils.sleep(1000 * intervalSec))
+//		this.process(dataBundle);
+//	});
 	var dataBundle = new DisplayDataBundle();
-	this.record(res.body(), dataBundle);
-
-	this.exe.execute(() -> {
-	    while (XUtils.sleep(1000 * intervalSec))
-		this.process(dataBundle);
-	});
-
 	return dataBundle;
     }
 
