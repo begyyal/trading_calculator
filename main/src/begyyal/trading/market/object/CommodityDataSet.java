@@ -7,4 +7,9 @@ public class CommodityDataSet implements MarketData {
     public ProductCategory getCategory() {
 	return ProductCategory.Commodity;
     }
+
+    @Override
+    public PriceSet getPriceSet(ProductKey<?> key) {
+	return null;
+    }
 }

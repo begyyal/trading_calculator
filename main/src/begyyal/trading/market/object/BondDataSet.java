@@ -7,4 +7,9 @@ public class BondDataSet implements MarketData {
     public ProductCategory getCategory() {
 	return ProductCategory.Bond;
     }
+
+    @Override
+    public PriceSet getPriceSet(ProductKey<?> key) {
+	return null;
+    }
 }

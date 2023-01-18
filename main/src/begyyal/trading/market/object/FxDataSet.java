@@ -8,4 +8,9 @@ public class FxDataSet implements MarketData {
     public ProductCategory getCategory() {
 	return ProductCategory.Fx;
     }
+
+    @Override
+    public PriceSet getPriceSet(ProductKey<?> key) {
+	return null;
+    }
 }
